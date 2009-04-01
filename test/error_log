@@ -1,0 +1,4 @@
+[09-Jul-2008 10:50:55] PHP Warning:  mysql_select_db(): supplied argument is not a valid MySQL-Link resource in /home/eima8298/public_html/ci/populate/index.php on line 4
+[09-Jul-2008 10:50:55] PHP Warning:  mysql_query() [<a href='function.mysql-query'>function.mysql-query</a>]: Access denied for user 'eima8298'@'localhost' (using password: NO) in /home/eima8298/public_html/ci/populate/index.php on line 6
+[09-Jul-2008 10:50:55] PHP Warning:  mysql_query() [<a href='function.mysql-query'>function.mysql-query</a>]: A link to the server could not be established in /home/eima8298/public_html/ci/populate/index.php on line 6
+[09-Jul-2008 10:50:55] PHP Warning:  mysql_fetch_array(): supplied argument is not a valid MySQL result resource in /home/eima8298/public_html/ci/populate/index.php on line 10
