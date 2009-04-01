@@ -18,7 +18,7 @@ $approval_status = $_POST['approval_status'];
 $widget_newTotal = $_POST['widget_total'];
 
 //@ $db = mysql_pconnect('mysql50-31.wc1:3306', '344827_1c3b3rg', 's0c14lm3d14tr00p');
-@ $db = mysql_pconnect('localhost', 'root', 'root');
+@ $db = mysql_connect('localhost', 'root', 'root');
 //test connection
 if (!$db) echo 'Error [index.php]:  Could not connect to the database.';
 ?>
