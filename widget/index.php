@@ -5,6 +5,16 @@
 <title>Iceberg Widget - Populate</title>
 
 <link href="/css/display.css" rel="stylesheet" type="text/css">
+<script language="javascript" src="jquery.js"></script>
+<script language="javascript">
+  jQuery(function() {
+    jQuery('#campaign_select').click(function() {
+      if(this.value != "")
+        location.href = "index.php?campaign_id=" + this.value;
+      });
+  });
+</script>
+
 
 </head>
 
@@ -31,6 +41,7 @@ $result_campaigns = mysql_query($query_campaigns);
   <div id="widget_container">
     <div id="campaign_select_container">
       <select id="campaign_select">
+        <option value="">Select a Campaign</option>
         <?
           while($row_campaigns = mysql_fetch_array($result_campaigns))  {
             echo("<option value=\"{$row_campaigns['campaign_id']}\">{$row_campaigns['campaign']}</option>");
@@ -40,43 +51,47 @@ $result_campaigns = mysql_query($query_campaigns);
     </div>
     <div id="campaign_posts_container">
 
-    <?
-    echo $_GET['campaign_id'];
-
-      if(isset($_GET['campaign_id'])) {
-
-        $query_limits = "SELECT widget_num
-                from campaign_index
-                where campaign_id = {$_GET['campaign_id']}";
-
-        $result_limits = mysql_query($query_limits);
-        $result_limit = mysql_fetch_array($result_limits);
-        $limit = $result_limit['widget_num'];
-
-        $query_posts =  "Select post_index.content, post_index.url, post_index.image_url
-                      from post_index
-                      inner join source_campaign on post_index.source_id = source_campaign.source_id
-                      inner join campaign_index on source_campaign.campaign_id = campaign_index.campaign_id
-                      where campaign_index.campaign_id = {$_GET['campaign_id']}
-                      and approval = 1
-                      order by post_index.approval_date DESC
-                      limit {$limit}";
- //       echo $query_posts;
-
-        $result_posts = mysql_query($query_posts);
-
-        while($row_posts = mysql_fetch_array($result_posts)) { ?>
-
-          <div class="post">
-            <div class="post_title"><?= $result_posts['content'] ?></div>
-            <div class="post_body"></div>
-          </div>
+      <?
+        if(isset($_GET['campaign_id'])) {
 
 
 
-        <?}
-        }
-    ?>
+          $query_campaign = "SELECT widget_num, campaign
+                  from campaign_index
+                  where campaign_id = {$_GET['campaign_id']}";
+
+          $result_campaign = mysql_query($query_campaign);
+          $campaign_details = mysql_fetch_array($result_campaign);
+          $limit = $campaign_details['widget_num'];
+          $campaign_title = $campaign_details['campaign'];
+
+          echo "<div id='campaign_title'>" . $campaign_title . "</div>";
+
+          $query_posts =  "Select post_index.content, post_index.url, post_index.image_url, source_index.type as source_type
+                        from post_index
+                        inner join source_campaign on post_index.source_id = source_campaign.source_id
+                        inner join campaign_index on source_campaign.campaign_id = campaign_index.campaign_id
+                        inner join source_index on post_index.source_id = source_index.source_id
+                        where campaign_index.campaign_id = {$_GET['campaign_id']}
+                        and approval = 1
+                        order by post_index.approval_date DESC
+                        limit {$limit}";
+
+          $result_posts = mysql_query($query_posts);
+
+          while($row_posts = mysql_fetch_array($result_posts)) { ?>
+
+            <div class="post">
+              <? if($row_posts['image_url'] != "") : ?>
+                <div class="post_image"><img src='<? echo $row_posts['image_url'] ?>' /></div>
+              <? endif; ?>
+              <div class="post_body"><a target="new" href='<? echo $row_posts['url'] ?>'><? echo $row_posts['content'] ?></a></div>
+            </div>
+
+
+          <?}
+          }
+      ?>
 
     </div>
 
