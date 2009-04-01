@@ -9,16 +9,16 @@
 </head>
 
 <body>
-	hello
 <?
 
 //PULL IN ALL THE FEEDS AND RUN
-@ $db = mysql_pconnect('mysql50-31.wc1:3306', '344827_1c3b3rg', 's0c14lm3d14tr00p');
+//@ $db = mysql_pconnect('mysql50-31.wc1:3306', '344827_1c3b3rg', 's0c14lm3d14tr00p');
+@ $db = mysql_pconnect('localhost', 'root', 'root');
 //test connection
 if (!$db) echo 'Error [index.php]:  Could not connect to the database.';
 
 mysql_select_db('344827_iceDEV', $db);
-$query_RSS = "SELECT source_index.source, source_index.url, source_index.feed, source_index.type
+$query_RSS = "SELECT source_index.source, source_index.url, source_index.feed, source_index.type, source_index.source_id
 								FROM source_index
 								JOIN source_campaign ON source_index.source_id = source_campaign.source_id
 								JOIN campaign_index ON source_campaign.campaign_id = campaign_index.campaign_id
@@ -27,12 +27,11 @@ echo $query_RSS;
 $result_RSS = mysql_query($query_RSS);
 
 while($row_RSS = mysql_fetch_array($result_RSS)) :
-	$type = $row_RSS['type'];
+	$source_id = $row_RSS['source_id'];
 	$source = $row_RSS['source'];
+	$type = $row_RSS['type'];
 	$url = $row_RSS['url'];
 	$feed = $row_RSS['feed'];
-
-	$date = date('Y-m-d G:i:s');
 
 	//BLOG
 	if ($type == '1a' || $type == '1b') :
@@ -42,15 +41,18 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 
 		echo '<h2><a href="' .$url. '">Site: '.$source. '</a></h2>';
 
-		$result_count  = 0;
-
+		$count = '';
+		
 		foreach ($rss->items as $item) :
-
+			$count++;
+			$date = date('Y-m-d G:i:s');
+			
 			// grab each element - RSS 2.0
-			$content = addslashes($item[title]); // title of post
-
-			$feed = addslashes($item[link]); // link to post via feed
-			$guid = $item[guid]; // post url
+			$title = $item['title']; // title of post
+			$content = $source. ': ' .$title;
+			
+			$feed = $item['link']; // link to post via feed
+			$guid = $item['guid']; // post url
 
 			//determine which post url to use
 			if ($type == '1a') $url = $feed;
@@ -81,16 +83,18 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			//if there is no date, add this to the db
 			if (!$pubdate) $pubdate = 'No Date :(';
 			$pubdate = addslashes($pubdate);
-			*/
-
-			echo $count. '. <br>
+			
+*/
+/*			echo $count. '. <br>
 				date: ' .$date. '<br>
 				url: <a href="' .$url. '" target="_blank">' .$url. '</a><br>
 				content: ' .$content. '<br>
-				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';
+				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';*/
 
 			//ADD TO DB
-			//include ('rss_add.php');
+			include ('rss_add.php');
+			
+			
 		endforeach;
 
 
@@ -106,6 +110,7 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 
 		foreach ($rss->items as $item) :
 			$count++;
+			$date = date('Y-m-d G:i:s');
 
 			/*
 			$date = $item['published'];
@@ -114,18 +119,24 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			*/
 
 			$url = $item['link'];
-			$content  = $item['title'];
+			
+			$title = $item['title']; // title of post
+			$content = $source. ': ' .$title;
 
 			$image = $item['link'];
 
-			echo $count. '. <br>
+			
+/*			echo $count. '. <br>
 				date: ' .$date. '<br>
 				url: <a href="' .$url. '" target="_blank">' .$url. '</a><br>
 				content: ' .$content. '<br>
-				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';
+				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';*/
+			
 
 			//ADD TO DB
-			//include ('rss_add.php');
+			include ('rss_add.php');
+			
+			
 		endforeach;
 
 	//FLICKR
@@ -140,8 +151,11 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 
 		foreach ($rss->items as $item) :
 			$count++;
+			$date = date('Y-m-d G:i:s');
 
-			$content  = $item['title'];
+			$title = $item['title']; // title of post
+			$content = $source. ': ' .$title;
+			
 			$url = $item['link'];
 
 			$image = $item['description'];
@@ -155,14 +169,18 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			//Convert $date to datetime
 			//Tue, 10 Feb 2009 19:52:01 -0800
 
-			echo $count. '. <br>
+			
+/*			echo $count. '. <br>
 				date: ' .$date. '<br>
 				url: <a href="' .$url. '" target="_blank">' .$url. '</a><br>
 				content: ' .$content. '<br>
-				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';
-
+				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';*/
+			
+			
 			//ADD TO DB
-			//include ('rss_add.php');
+			include ('rss_add.php');
+			
+			
 		endforeach;
 
 
@@ -178,13 +196,16 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 
 		foreach ($rss->items as $item) :
 			$count++;
+			$date = date('Y-m-d G:i:s');
 
 			//$date = $item['pubDate'];
 			//Convert $date to datetime
 			//Wed, 11 Mar 2009 10:53:49 -0700
 
-			$content  = $item['title'];
-	    $url = $item['link'];
+			$title = $item['title']; // title of post
+			$content = $source. ': ' .$title;
+			
+	    	$url = $item['link'];
 
 			$image = $item['description'];
 			$image = str_replace('<a', '<p', $image);
@@ -194,14 +215,16 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			$image = $image[0];
 
 
-			echo $count. '. <br>
+			
+/*			echo $count. '. <br>
 				date: ' .$date. '<br>
 				url: <a href="' .$url. '" target="_blank">' .$url. '</a><br>
 				content: ' .$content. '<br>
-				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';
+				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';*/
+			
 
 			//ADD TO DB
-			//include ('rss_add.php');
+			include ('rss_add.php');
 		endforeach;
 
 
