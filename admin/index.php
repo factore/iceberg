@@ -15,12 +15,27 @@ $campaign_select = $_POST['campaign_select'];
 $source_select = $_POST['source_select'];
 $post_select = $_POST['post_select'];
 $approval_status = $_POST['approval_status'];
+$widget_newTotal = $_POST['widget_total'];
 
 //@ $db = mysql_pconnect('mysql50-31.wc1:3306', '344827_1c3b3rg', 's0c14lm3d14tr00p');
 @ $db = mysql_pconnect('localhost', 'root', 'root');
 //test connection
 if (!$db) echo 'Error [index.php]:  Could not connect to the database.';
 ?>
+
+<? //CHANGE TOTAL TO SHOW IN WIDGET ?>
+
+<?
+if($widget_newTotal) :
+	mysql_select_db('344827_iceDEV', $db);
+	$update_widgetNum = "UPDATE campaign_index SET widget_num = $widget_newTotal WHERE campaign_id = $campaign_select";
+	//echo $update_widgetNum. ' - 1<br>';
+	$updated_widgetNum = mysql_query($update_widgetNum);	
+	$update_widget = 'Widget total has been updated';
+endif;
+?>
+
+
 
 <? //APPROVE/REMOVE FOR/FROM WIDGET ?>
 
@@ -47,57 +62,73 @@ if($post_select) :
 		$updated_approval = mysql_query($update_approval);		
 		$update_note = 'has been removed'; 
 		}
-	echo '<div class="widget_update">' .$post_select. ' ' .$update_note. ' to the widget.</div>';
+	$update_widget = '<div class="widget_update">' .$post_select. ' ' .$update_note. ' to the widget.</div>';
 endif;
 ?>
+
+<?= $update_widget ?>
 
 <? //LOGIN & CONFIRM ?>
 
 <? //DROPDOWN: SELECT A CAMPAIGN ?>
 <div class="admin_wrap">
-<form class="admin_form" action="?" method="post" accept-charset="utf-8">
-	<select class="admin_campaign" name="campaign_select">
-	<option value="">Select a Campaign</option>
-	<?
-	mysql_select_db('344827_iceDEV', $db);
-	$query_campaign = "SELECT * FROM campaign_index WHERE client_id = 1";
-	$result_campaign = mysql_query($query_campaign);
-	while($row_campaign = mysql_fetch_array($result_campaign)) :
-		$campaign_id = $row_campaign['campaign_id'];
-		$campaign = $row_campaign['campaign'];
-		?>
-	  <option class="campaign_option" value="<?= $campaign_id ?>"><?= $campaign ?></option>
-	<? endwhile; ?>
-	</select>
-	<input class="admin_submit" type="submit" value="Compile List">
-</form>
+	<div class="campaign_wrap">
+		<form class="admin_form" action="?" method="post" accept-charset="utf-8">
+			<select class="admin_campaign" name="campaign_select">
+			<option value="">Select a Campaign</option>
+			<?
+			mysql_select_db('344827_iceDEV', $db);
+			$query_campaign = "SELECT * FROM campaign_index WHERE client_id = 1";
+			$result_campaign = mysql_query($query_campaign);
+			while($row_campaign = mysql_fetch_array($result_campaign)) :
+				$campaign_id = $row_campaign['campaign_id'];
+				$campaign = $row_campaign['campaign'];
+				?>
+			  <option class="campaign_option" value="<?= $campaign_id ?>"><?= $campaign ?></option>
+			<? endwhile; ?>
+			</select>
+			<input class="admin_submit" type="submit" value="Compile List">
+		</form>
+	</div>
 
-<? if($campaign_select) : ?>
-	<? //DROPDOWN: SELECT A SOURCE ?>
-	<form class="admin_form" action="?" method="post" accept-charset="utf-8">
-		<select class="admin_source" name="source_select">
-		<option value="">All Sources</option>
-		<?
-		mysql_select_db('344827_iceDEV', $db);
-		$query_source = "SELECT source_index.* FROM source_index 
-								JOIN source_campaign ON source_index.source_id = source_campaign.source_id
-								JOIN campaign_index ON source_campaign.campaign_id = campaign_index.campaign_id
-								WHERE campaign_index.campaign_id = $campaign_select";
-		echo $query_source;
-		$result_source = mysql_query($query_source);
-		while($row_source = mysql_fetch_array($result_source)) :
-			$source_id = $row_source['source_id'];
-			$source = $row_source['source'];
-			?>
-		  	<option class="source_option" value="<?= $source_id ?>"<? if($source_select == $source_id) echo ' selected="selected"' ?>>
-				<?= $source ?>
-			</option>
-		<? endwhile; ?>
-		</select>
-		<input type="hidden" value="<?= $campaign_select ?>" name="campaign_select">
-		<input class="admin_submit" type="submit" value="Filter List">
-	</form>
-<? endif; ?>
+	<? if($campaign_select) : ?>
+		<? //DROPDOWN: SELECT A SOURCE ?>
+		<div class="source_wrap">
+		<form class="admin_form" action="?" method="post" accept-charset="utf-8">
+			<select class="admin_source" name="source_select">
+			<option value="">All Sources</option>
+			<?
+			mysql_select_db('344827_iceDEV', $db);
+			$query_source = "SELECT source_index.*, campaign_index.widget_num FROM source_index 
+									JOIN source_campaign ON source_index.source_id = source_campaign.source_id
+									JOIN campaign_index ON source_campaign.campaign_id = campaign_index.campaign_id
+									WHERE campaign_index.campaign_id = $campaign_select";
+			echo $query_source;
+			$result_source = mysql_query($query_source);
+			while($row_source = mysql_fetch_array($result_source)) :
+				$source_id = $row_source['source_id'];
+				$source = $row_source['source'];
+				$widget_total = $row_source['widget_num'];
+				?>
+			  	<option class="source_option" value="<?= $source_id ?>"<? if($source_select == $source_id) echo ' selected="selected"' ?>>
+					<?= $source ?>
+				</option>
+			<? endwhile; ?>
+			</select>
+			<input type="hidden" value="<?= $campaign_select ?>" name="campaign_select">
+			<input class="admin_submit" type="submit" value="Filter List">
+		</form>
+		</div>
+		
+		<div class="widget_total">
+			<form action="?" method="post" accept-charset="utf-8">
+				Number of posts to appear on the widget: <input type="text" value="<?= $widget_total ?>" name="widget_total">
+				<input class="widget_submit" type="submit" value="Update total">
+				<input type="hidden" value="<?= $campaign_select ?>" name="campaign_select">
+				<input type="hidden" value="<?= $source_select ?>" name="source_select">
+			</form>
+		</div>	
+	<? endif; ?>
 </div>
 
 <? //COMPILE LIST ?>
