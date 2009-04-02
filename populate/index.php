@@ -33,6 +33,11 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 	$url = $row_RSS['url'];
 	$feed = $row_RSS['feed'];
 
+	$image = '';
+	$url = '';
+	$content = '';
+	$date = '';
+	
 	//BLOG
 	if ($type == '1a' || $type == '1b') :
 		//GRAB RSS FEEDS
@@ -49,7 +54,7 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			
 			// grab each element - RSS 2.0
 			$title = $item['title']; // title of post
-			$content = $source. ': ' .$title;
+			$content = $source. ' - ' .$title;
 			
 			$feed = $item['link']; // link to post via feed
 			$guid = $item['guid']; // post url
@@ -121,9 +126,9 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			$url = $item['link'];
 			
 			$title = $item['title']; // title of post
-			$content = $source. ': ' .$title;
+			$content = $source. ' - ' .$title;
 
-			$image = $item['link'];
+			//$image = $item['link'];
 
 			
 /*			echo $count. '. <br>
@@ -154,7 +159,7 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			$date = date('Y-m-d G:i:s');
 
 			$title = $item['title']; // title of post
-			$content = $source. ': ' .$title;
+			$content = $source. ' - ' .$title;
 			
 			$url = $item['link'];
 
@@ -203,24 +208,23 @@ while($row_RSS = mysql_fetch_array($result_RSS)) :
 			//Wed, 11 Mar 2009 10:53:49 -0700
 
 			$title = $item['title']; // title of post
-			$content = $source. ': ' .$title;
+			$content = $source. ' - ' .$title;
 			
 	    	$url = $item['link'];
 
 			$image = $item['description'];
 			$image = str_replace('<a', '<p', $image);
-
 			$image = explode('<img src="', $image);
 			$image = explode('" align=', $image[1]);
 			$image = $image[0];
 
 
 			
-/*			echo $count. '. <br>
+			echo $count. '. <br>
 				date: ' .$date. '<br>
 				url: <a href="' .$url. '" target="_blank">' .$url. '</a><br>
 				content: ' .$content. '<br>
-				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';*/
+				image: <a href="' .$image. '" target="_blank">' .$image. '</a><br><br>';
 			
 
 			//ADD TO DB

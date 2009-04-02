@@ -193,7 +193,6 @@ class Auth
 			$withsession = array("session" => $_COOKIE['session']);
 			if ($this->numUsers($withsession) == 1) {
 				$this->login($withsession);
-				setcookie('session', addslashes($_COOKIE['session']), time()+$this->inactiveLogout, "/");
 				$this->loggedIn = true;
 			}
 		} else {
@@ -639,11 +638,12 @@ class Auth
 				if (DB::isError($result))
 					$this->apology($result->getDebugInfo());
 				$result->fetchInto($props,DB_FETCHMODE_ASSOC);
-				foreach ($props as $key => $value)
-				{
-					$this->user[$key] = $value;
-				}
 
+/*        foreach ($props as $key => $value)
+        {
+          $this->user[$key] = $value;
+        }
+*/
 				// Now log the event
 				if (sizeof($user) > 1){
 					$id = $this->user['id'];
